@@ -11,8 +11,8 @@ public abstract class Element {
 	}
 	
 	Element(String imagePath) {
-		this.img = new ImageIcon(getClass().getResource(imagePath));
-		this.setLbImg(new JLabel("", img, JLabel.CENTER));
+		img = new ImageIcon(getClass().getResource(imagePath));
+		setLbImg(new JLabel("", img, JLabel.CENTER));
 	}
 	
 	public JLabel getLbImg() {

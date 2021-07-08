@@ -4,6 +4,6 @@ public class Main{
 		
 		Race game = new Race();
 		game.screen.setVisible(true);
-		
+		game.run();
 	}
 }
