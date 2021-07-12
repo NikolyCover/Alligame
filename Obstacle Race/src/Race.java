@@ -2,7 +2,12 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class Race implements Game{
+import javax.swing.ImageIcon;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+public class Race implements Game, KeyListener{
 	Screen screen;
 	Character character;
 	ArrayList <Obstacle> obstacles;
@@ -10,23 +15,15 @@ public class Race implements Game{
 	
 	Race() {
 		character = new Character("/media/Luffy.gif");
-		character.getLbImg().setBounds(20, 250, 200, 200);
 		
 		screen = new Screen();	
 		screen.createVisualElements(character);
+		screen.addKeyListener(this);
 	}
 
 	@Override
 	public void play() {
 		// TODO Auto-generated method stub
-		
-	}
-	
-	public void createObstacles() {
-		
-	}
-	
-	public void checkCollision() {
 		
 	}
 	
@@ -45,15 +42,47 @@ public class Race implements Game{
 		int x1 = screen.getFloor1().getX();
 		int x2 = screen.getFloor2().getX();
 		
-		screen.getFloor1().setBounds(x1 - 10, 400, 2400, 200);
-		screen.getFloor2().setBounds(x2 - 10, 400, 2400, 200);
+		screen.getFloor1().setLocation(x1 - 10, screen.getFloor1().getY());
+		screen.getFloor2().setLocation(x2 - 10, screen.getFloor2().getY());
 		
 		if(screen.getFloor1().getX() == 0 || screen.getFloor2().getX() == 0) {
 			if(screen.getFloor1().getX() == 0) {
-				screen.getFloor2().setBounds(2400, 400, 2400, 2400);
+				screen.getFloor2().setLocation(screen.getFloor1().getWidth(), screen.getFloor2().getY());
 			} else {
-				screen.getFloor1().setBounds(2400, 400, 2400, 2400);
+				screen.getFloor1().setLocation(screen.getFloor2().getWidth(), screen.getFloor1().getY());
 			}
 		}
 	}
-}
+	
+
+	public void createObstacle() {
+		
+	}
+	
+	public void checkCollision() {
+		
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		int key = e.getKeyCode();
+		
+		if(key ==  KeyEvent.VK_SPACE) {
+			character.getLbImg().setIcon(new ImageIcon(getClass().getResource("/media/Luffy.png")));
+			character.jump();
+			character.getLbImg().setIcon(new ImageIcon(getClass().getResource("/media/Luffy.gif")));
+		}
+		
+	}
+	
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}}

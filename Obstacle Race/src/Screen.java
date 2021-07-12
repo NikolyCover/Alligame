@@ -6,6 +6,8 @@ import javax.swing.JLabel;
 import javax.swing.WindowConstants;
 
 public class Screen extends JFrame{
+	private static final long serialVersionUID = 1L;
+	
 	private Container container;
 	private JLabel sky;
 	private JLabel floor1;
@@ -31,6 +33,10 @@ public class Screen extends JFrame{
 		sky = new JLabel("", new ImageIcon(getClass().getResource("/media/sky.png")), JLabel.CENTER);
 		sky.setBounds(0, 0, 1200, 514);
 		
+		addElements(character);
+	}
+	
+	public void addElements(Character character) {
 		container.add(character.getLbImg());
 		container.add(floor1);
 		container.add(floor2);
@@ -39,10 +45,6 @@ public class Screen extends JFrame{
 	
 	public void addElement(Element element) {
 		container.add(element.getLbImg());
-	}
-	
-	public Container getContainer() {
-		return container;
 	}
 
 	public void setContainer(Container container) {
