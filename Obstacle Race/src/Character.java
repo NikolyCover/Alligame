@@ -8,7 +8,7 @@ public class Character extends Element {
 	
 	Character(String imgPath) {
 		super(imgPath);
-		getLbImg().setBounds(20, 250, 200, 200);
+		getLbImg().setBounds(80, 280, getLbImg().getIcon().getIconWidth(), getLbImg().getIcon().getIconHeight());
 	}
 	
 	public void jump() {

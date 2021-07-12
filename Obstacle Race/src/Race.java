@@ -1,8 +1,10 @@
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -10,11 +12,22 @@ import java.awt.event.KeyListener;
 public class Race implements Game, KeyListener{
 	Screen screen;
 	Character character;
+	Obstacle obstacleTemplates[] = {
+			new Obstacle("/media/obstacles/vaccine_small.png"),
+			new Obstacle("/media/obstacles/vaccine_medium.png"),
+			new Obstacle("/media/obstacles/vaccine_large.png"),
+			new Obstacle("/media/obstacles/vaccines_small.png"),
+			new Obstacle("/media/obstacles/vaccines_medium.png"),
+			new Obstacle("/media/obstacles/vaccines_wide.png"),
+			new Obstacle("/media/obstacles/vaccines_large.png")
+	};
 	ArrayList <Obstacle> obstacles;
 	//associação de agregação
 	
 	Race() {
 		character = new Character("/media/Luffy.gif");
+		
+		obstacles = new ArrayList<Obstacle>();
 		
 		screen = new Screen();	
 		screen.createVisualElements(character);
@@ -29,13 +42,22 @@ public class Race implements Game, KeyListener{
 	
 	public void run() {		
         Timer timer = new Timer();
-        
+    	        
     	timer.scheduleAtFixedRate(
     		new TimerTask() {
     			public void run() {
-    				moveFloor();
+    				createObstacle();
     			}
-    		}, 0, 20);
+    		}, 0, 1200);
+    	
+    	timer.scheduleAtFixedRate(
+        		new TimerTask() {
+        			public void run() {
+        				moveFloor();
+        				moveObstacles();
+        				DiscardObstacleUnused();
+        			}
+        		}, 0, 20);
     }
 	
 	public void moveFloor() {
@@ -56,7 +78,30 @@ public class Race implements Game, KeyListener{
 	
 
 	public void createObstacle() {
+		Random rnd = new Random();
 		
+		obstacles.add(obstacleTemplates[rnd.nextInt(obstacleTemplates.length)]);
+		
+		JLabel obstacle = obstacles.get(obstacles.size() - 1).getLbImg();
+		obstacle.setBounds(1200, 280, obstacle.getIcon().getIconWidth(), obstacle.getIcon().getIconHeight());
+		//deixar altura não estática
+
+		screen.getContainer().add(obstacle);
+		screen.getContainer().setComponentZOrder(obstacle, 1);
+	}
+	
+	public void moveObstacles() {
+		for(Obstacle obs : obstacles) {
+			obs.getLbImg().setLocation(obs.getLbImg().getX() - 10, obs.getLbImg().getY());
+		}
+	}
+	
+	public void DiscardObstacleUnused() {
+		for(Obstacle obs : obstacles) {
+			if(obs.getLbImg().getX() <=  0) {
+				obstacles.remove(obs);
+			}		
+		}
 	}
 	
 	public void checkCollision() {
