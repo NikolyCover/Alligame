@@ -4,10 +4,9 @@ import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.function.Predicate;
 
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 
-import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -49,23 +48,31 @@ public class Race implements Game, KeyListener{
     	
     	timer.schedule(
         		new TimerTask() {
+        			int teste = 0;
         			
         			public void run() {
         				
-        				moveFloor();
-        				
-        				if(!obstacles.isEmpty()) {
-        					moveObstacle();
-        					removeUnusedObstacles();
-        				}
-        				
-        				if(obstacles.size() < 1) {
-        					createObstacle();
+        				if(!thereWasACollision()) {
+        					moveFloor();
+            				
+            				if(!obstacles.isEmpty()) {
+            					moveObstacle();
+            					removeUnusedObstacles();
+            					
+            				}
+            				
+            				if(obstacles.size() < 1) {
+            					createObstacle();
+            				}
+        				} else if(thereWasACollision() && teste == 0) {
+        					gameOver();
+        					teste = 1;
+        					//timer.cancel();
         				}
         				
         			}
         		}, 0, 10);
-
+    
     }
 	
 	public void moveFloor() {
@@ -90,11 +97,9 @@ public class Race implements Game, KeyListener{
 		Obstacle obs = obstacleTemplates[rnd.nextInt(obstacleTemplates.length)];
 		
 		obs.getLbImg().setBounds(1200, obs.yToBaseAlign(character, character.getyInitial()), obs.getImg().getIconWidth(), obs.getImg().getIconHeight());
-		Border blackline = BorderFactory.createLineBorder(Color.black);
-		obs.getLbImg().setBorder(blackline);
 		
 		obstacles.add(obs);
-		screen.obtainContainer().add(obs.getLbImg(), 0);
+		screen.obtainContainer().add(obs.getLbImg(), 1);
 		
 	}
 	
@@ -125,8 +130,69 @@ public class Race implements Game, KeyListener{
 		return null;
 	}
 
-	public void checkCollision() {
+	public boolean thereWasACollision() {
+		int crt_x1 = character.getLbImg().getX();
+		int crt_x2 = character.getLbImg().getX() + character.getLbImg().getWidth();
+		//int crt_y1 = character.getLbImg().getY();
+		int crt_y2 = character.getLbImg().getY() + character.getLbImg().getHeight();
 		
+		for(Obstacle obs : obstacles) {
+			int obs_x1 = obs.getLbImg().getX();
+			int obs_x2 = obs.getLbImg().getX() + obs.getLbImg().getWidth();
+			int obs_y1 = obs.getLbImg().getY();
+			int obs_y2 = obs.getLbImg().getY() + obs.getLbImg().getHeight();
+			
+			if((obs_x1 > crt_x1 && obs_x1 < crt_x2) && (crt_y2 <= obs_y2 && crt_y2 >= obs_y1)) {
+				return true;
+			}
+			
+			else if((crt_x1 > obs_x1 && crt_x1 < obs_x2) && (crt_y2 <= obs_y2 && crt_y2 >= obs_y1)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public void gameOver() {
+		/*ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+		
+		scheduler.schedule(new Runnable() {
+		       public void run() {
+		    	   JLabel explosion = new JLabel("", new ImageIcon(getClass().getResource("/media/explosion.gif")), JLabel.CENTER);
+		    	   explosion.setBounds(0, character.getLbImg().getY() - (character.getImg().getIconHeight() / 2), explosion.getIcon().getIconWidth(), explosion.getIcon().getIconHeight());
+
+		    	   screen.obtainContainer().add(explosion, 0);
+		    	   
+		    	   try {
+		    		   scheduler.wait(1000);
+		    	   } catch (InterruptedException e) {
+		    		   // TODO Auto-generated catch block
+		    		   e.printStackTrace();
+		    	   }
+		    	   
+		    	   character.getLbImg().setIcon(new ImageIcon(getClass().getResource("/media/alligator.png")));
+	    		   screen.obtainContainer().remove(explosion);
+	    		   
+	    		   System.out.println("teste ui ui");
+		       }
+		}, 0, TimeUnit.SECONDS);*/
+		
+		JLabel explosion = new JLabel("", new ImageIcon(getClass().getResource("/media/explosion.gif")), JLabel.CENTER);
+		explosion.setBounds(0, character.getLbImg().getY() - (character.getImg().getIconHeight() / 2), explosion.getIcon().getIconWidth(), explosion.getIcon().getIconHeight());
+		
+		screen.obtainContainer().add(explosion, 0);
+		character.getLbImg().setIcon(new ImageIcon(getClass().getResource("/media/alligator.png")));
+		character.getLbImg().setSize(character.getLbImg().getIcon().getIconWidth(), character.getLbImg().getIcon().getIconHeight());
+
+		try {
+			Thread.sleep(900);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		screen.obtainContainer().remove(explosion);
 	}
 
 	@Override

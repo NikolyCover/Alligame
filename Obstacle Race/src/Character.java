@@ -1,9 +1,5 @@
-import java.awt.Color;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
 
 public class Character extends Element {
 	private String name;
@@ -17,8 +13,8 @@ public class Character extends Element {
 		getLbImg().setBounds(x, y, getLbImg().getIcon().getIconWidth(), getLbImg().getIcon().getIconHeight());
 		this.yInitial = y;
 		
-		Border blackline = BorderFactory.createLineBorder(Color.black);
-		getLbImg().setBorder(blackline);
+		/*Border blackline = BorderFactory.createLineBorder(Color.black);
+		getLbImg().setBorder(blackline);*/
 	}
 	
 	public void jump() {
