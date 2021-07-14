@@ -1,17 +1,20 @@
-import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.function.Predicate;
 
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
+import javax.swing.BorderFactory;
+import javax.swing.border.Border;
 
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class Race implements Game, KeyListener{
-	Screen screen;
-	Character character;
+	private Screen screen;
+	private Character character;
+
 	Obstacle obstacleTemplates[] = {
 			new Obstacle("/media/obstacles/vaccine_small.png"),
 			new Obstacle("/media/obstacles/vaccine_medium.png"),
@@ -19,16 +22,16 @@ public class Race implements Game, KeyListener{
 			new Obstacle("/media/obstacles/vaccines_small.png"),
 			new Obstacle("/media/obstacles/vaccines_medium.png"),
 			new Obstacle("/media/obstacles/vaccines_wide.png"),
-			new Obstacle("/media/obstacles/vaccines_large.png")
+			//new Obstacle("/media/obstacles/vaccines_large.png")
 	};
-	ArrayList <Obstacle> obstacles;
-	//associação de agregação
+	
+	ArrayBlockingQueue<Obstacle> obstacles;
 	
 	Race() {
+		obstacles = new ArrayBlockingQueue<Obstacle>(10);
+		
 		character = new Character("/media/Luffy.gif");
-		
-		obstacles = new ArrayList<Obstacle>();
-		
+			
 		screen = new Screen();	
 		screen.createVisualElements(character);
 		screen.addKeyListener(this);
@@ -42,22 +45,27 @@ public class Race implements Game, KeyListener{
 	
 	public void run() {		
         Timer timer = new Timer();
-    	        
-    	timer.scheduleAtFixedRate(
-    		new TimerTask() {
-    			public void run() {
-    				createObstacle();
-    			}
-    		}, 0, 1200);
+        
     	
-    	timer.scheduleAtFixedRate(
+    	timer.schedule(
         		new TimerTask() {
+        			
         			public void run() {
+        				
         				moveFloor();
-        				moveObstacles();
-        				DiscardObstacleUnused();
+        				
+        				if(!obstacles.isEmpty()) {
+        					moveObstacle();
+        					removeUnusedObstacles();
+        				}
+        				
+        				if(obstacles.size() < 1) {
+        					createObstacle();
+        				}
+        				
         			}
-        		}, 0, 20);
+        		}, 0, 10);
+
     }
 	
 	public void moveFloor() {
@@ -76,34 +84,47 @@ public class Race implements Game, KeyListener{
 		}
 	}
 	
-
 	public void createObstacle() {
 		Random rnd = new Random();
 		
-		obstacles.add(obstacleTemplates[rnd.nextInt(obstacleTemplates.length)]);
+		Obstacle obs = obstacleTemplates[rnd.nextInt(obstacleTemplates.length)];
 		
-		JLabel obstacle = obstacles.get(obstacles.size() - 1).getLbImg();
-		obstacle.setBounds(1200, 280, obstacle.getIcon().getIconWidth(), obstacle.getIcon().getIconHeight());
-		//deixar altura não estática
-
-		screen.getContainer().add(obstacle);
-		screen.getContainer().setComponentZOrder(obstacle, 1);
+		obs.getLbImg().setBounds(1200, obs.yToBaseAlign(character), obs.getImg().getIconWidth(), obs.getImg().getIconHeight());
+		Border blackline = BorderFactory.createLineBorder(Color.black);
+		obs.getLbImg().setBorder(blackline);
+		
+		obstacles.add(obs);
+		screen.obtainContainer().add(obs.getLbImg(), 0);
+		
 	}
 	
-	public void moveObstacles() {
+	public void moveObstacle() {
 		for(Obstacle obs : obstacles) {
 			obs.getLbImg().setLocation(obs.getLbImg().getX() - 10, obs.getLbImg().getY());
 		}
 	}
 	
-	public void DiscardObstacleUnused() {
-		for(Obstacle obs : obstacles) {
-			if(obs.getLbImg().getX() <=  0) {
-				obstacles.remove(obs);
-			}		
+	public void removeUnusedObstacles() {
+		Obstacle obs = someObstacleCameOut();
+		
+		if(obs != null) {
+			obstacles.remove(obs);
+			screen.obtainContainer().remove(obs.getLbImg());
 		}
 	}
 	
+	public Obstacle someObstacleCameOut() {
+		Predicate<Obstacle> condition = (obs) -> obs.getLbImg().getX() <= (0 - obs.getLbImg().getWidth());
+		
+		for(Obstacle obs : obstacles) {
+			if(condition.test(obs)) {
+				return obs;
+			}
+		}
+		
+		return null;
+	}
+
 	public void checkCollision() {
 		
 	}
@@ -113,9 +134,7 @@ public class Race implements Game, KeyListener{
 		int key = e.getKeyCode();
 		
 		if(key ==  KeyEvent.VK_SPACE) {
-			character.getLbImg().setIcon(new ImageIcon(getClass().getResource("/media/Luffy.png")));
 			character.jump();
-			character.getLbImg().setIcon(new ImageIcon(getClass().getResource("/media/Luffy.gif")));
 		}
 		
 	}
@@ -130,4 +149,9 @@ public class Race implements Game, KeyListener{
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
 		
-	}}
+	}
+	
+	public Screen getScreen() {
+		return screen;
+	}
+}

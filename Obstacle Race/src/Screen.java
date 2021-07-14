@@ -16,8 +16,9 @@ public class Screen extends JFrame{
 	Screen() {
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setSize(1200, 600);
-		//this.setResizable(false);
+		this.setResizable(false);
 		this.setLocationRelativeTo(null);
+		this.setLayout(null);
 		
 		this.container = this.getContentPane();
 		this.container.setLayout(null);
@@ -47,7 +48,7 @@ public class Screen extends JFrame{
 		container.add(element.getLbImg());
 	}
 
-	public Container getContainer() {
+	public Container obtainContainer() {
 		return container;
 	}
 	
