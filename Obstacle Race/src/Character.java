@@ -9,18 +9,21 @@ public class Character extends Element {
 	private String name;
 	private int score;
 	private int record;
-	private int x = 80, y = 280;
+	private int yInitial;
 
-	Character(String imgPath) {
+	Character(String imgPath, int x, int y) {
 		super(imgPath);
+		
 		getLbImg().setBounds(x, y, getLbImg().getIcon().getIconWidth(), getLbImg().getIcon().getIconHeight());
+		this.yInitial = y;
+		
 		Border blackline = BorderFactory.createLineBorder(Color.black);
 		getLbImg().setBorder(blackline);
 	}
 	
 	public void jump() {
 	
-		if(getLbImg().getY() == y) {
+		if(getLbImg().getY() == yInitial) {
 			Timer timer = new Timer();
 	        
 	    	timer.scheduleAtFixedRate(
@@ -39,7 +42,7 @@ public class Character extends Element {
 	    				else if(isFalling()) {
 	    					getLbImg().setLocation(getLbImg().getX(), getLbImg().getY() + 1);
 	    					
-	    					if(getLbImg().getY() >= y) {
+	    					if(getLbImg().getY() >= yInitial) {
 	    						timer.cancel();
 	    					}
 	    				}
@@ -80,9 +83,9 @@ public class Character extends Element {
 	public void setRecord(int record) {
 		this.record = record;
 	}
-	
-	public int getY() {
-		return y;
+
+	public int getyInitial() {
+		return yInitial;
 	}
 	
 }

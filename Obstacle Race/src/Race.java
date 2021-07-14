@@ -30,7 +30,7 @@ public class Race implements Game, KeyListener{
 	Race() {
 		obstacles = new ArrayBlockingQueue<Obstacle>(10);
 		
-		character = new Character("/media/Luffy.gif");
+		character = new Character("/media/Luffy.gif", 80, 280);
 			
 		screen = new Screen();	
 		screen.createVisualElements(character);
@@ -89,7 +89,7 @@ public class Race implements Game, KeyListener{
 		
 		Obstacle obs = obstacleTemplates[rnd.nextInt(obstacleTemplates.length)];
 		
-		obs.getLbImg().setBounds(1200, obs.yToBaseAlign(character), obs.getImg().getIconWidth(), obs.getImg().getIconHeight());
+		obs.getLbImg().setBounds(1200, obs.yToBaseAlign(character, character.getyInitial()), obs.getImg().getIconWidth(), obs.getImg().getIconHeight());
 		Border blackline = BorderFactory.createLineBorder(Color.black);
 		obs.getLbImg().setBorder(blackline);
 		

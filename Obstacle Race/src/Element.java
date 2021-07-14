@@ -12,10 +12,10 @@ public abstract class Element {
 	}
 	
 	//retorna o y que um elemento deve ter para que fique alinhado na base de um elemento referencia
-	public int yToBaseAlign(Element reference) {
-		int yUp = (reference.getLbImg().getY() + reference.getLbImg().getHeight()) - this.getImg().getIconHeight();
+	public int yToBaseAlign(Element reference, int yRef) {
+		int y = (yRef + reference.getLbImg().getHeight()) - this.getImg().getIconHeight();
 		 
-		return yUp;
+		return y;
 	}
 	
 	public JLabel getLbImg() {
