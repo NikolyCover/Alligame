@@ -1,4 +1,8 @@
+package race;
 import java.awt.Container;
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -12,8 +16,14 @@ public class Screen extends JFrame{
 	private JLabel sky;
 	private JLabel floor1;
 	private JLabel floor2;
-	
+	private JLabel record;
+	private JLabel score;
+
+	Font pressStart;
+
 	Screen() {
+		super("Alligame");
+		
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setSize(1200, 600);
 		this.setResizable(false);
@@ -22,23 +32,46 @@ public class Screen extends JFrame{
 		
 		this.container = this.getContentPane();
 		this.container.setLayout(null);
+		
+		font();
+	}
+	
+	public void font() {
+		try {
+			pressStart = Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("fonts/PressStart2P-Regular.ttf"));
+		} catch (FontFormatException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 	public void createVisualElements(Character character) {
-		floor1 = new JLabel("", new ImageIcon(getClass().getResource("/media/land.png")), JLabel.CENTER);
+		floor1 = new JLabel(new ImageIcon(getClass().getResource("/media/land.png")), JLabel.CENTER);
 		floor1.setBounds(0, 400, 2400, 200);
 		
-		floor2 = new JLabel("", new ImageIcon(getClass().getResource("/media/land.png")), JLabel.CENTER);
+		floor2 = new JLabel(new ImageIcon(getClass().getResource("/media/land.png")), JLabel.CENTER);
 		floor2.setBounds(2400, 400, 2400, 200);
 		
-		sky = new JLabel("", new ImageIcon(getClass().getResource("/media/sky.png")), JLabel.CENTER);
+		sky = new JLabel(new ImageIcon(getClass().getResource("/media/sky.png")), JLabel.CENTER);
 		sky.setBounds(0, 0, 1200, 514);
+		
+		record = new JLabel("RC: 0000");
+		record.setBounds(860, 0, 200, 100);
+		record.setFont(new Font("Sans-serif", 1, 32));
+		
+		score = new JLabel("SC: 0000");
+		score.setBounds(1030, 0, 200, 100);
+		score.setFont(new Font("Sans-serif", 1, 32));
 		
 		addElements(character);
 	}
 	
 	public void addElements(Character character) {
 		container.add(character.getLbImg());
+		container.add(record);
+		container.add(score);
 		container.add(floor1);
 		container.add(floor2);
 		container.add(sky);
@@ -78,5 +111,21 @@ public class Screen extends JFrame{
 
 	public void setFloor2(JLabel floor2) {
 		this.floor2 = floor2;
+	}
+
+	public JLabel getRecord() {
+		return record;
+	}
+
+	public void setRecord(JLabel record) {
+		this.record = record;
+	}
+
+	public JLabel getScore() {
+		return score;
+	}
+
+	public void setScore(JLabel score) {
+		this.score = score;
 	}
 }

@@ -1,3 +1,4 @@
+package race;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -11,7 +12,10 @@ public class Character extends Element {
 		super(imgPath);
 		
 		getLbImg().setBounds(x, y, getLbImg().getIcon().getIconWidth(), getLbImg().getIcon().getIconHeight());
+		
 		this.yInitial = y;
+		this.score = 0;
+		this.record = 0;
 	}
 	
 	public void jump() {

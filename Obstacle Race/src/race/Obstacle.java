@@ -1,3 +1,4 @@
+package race;
 public class Obstacle extends Element {
 	
 	Obstacle(String imgPath) {

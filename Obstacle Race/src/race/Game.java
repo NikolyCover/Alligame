@@ -1,3 +1,4 @@
+package race;
 
 public interface Game {
 

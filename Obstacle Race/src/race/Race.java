@@ -1,3 +1,4 @@
+package race;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,6 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class Race implements Game, KeyListener{
+	private int delay = 10;
 	private Screen screen;
 	private Character character;
 	Obstacle obstacleTemplates[] = {
@@ -28,6 +30,8 @@ public class Race implements Game, KeyListener{
 	private final int characterY = 280;
 	private final String characterImgPath = "/media/Luffy.gif";
 	
+	private boolean isRunning; //true if character is running
+		
 	Race() {
 		obstacles = new ArrayBlockingQueue<Obstacle>(10);
 		
@@ -46,21 +50,22 @@ public class Race implements Game, KeyListener{
 	
 	public void run() {		
         Timer timer = new Timer();
-        
     	
     	timer.schedule(
         		new TimerTask() {
-        			boolean alreadyover; //não deixa o final acontecer mais de uma vez
+        			boolean alredyOver; //não deixa o final acontecer mais de uma vez
         			
+        			@Override
         			public void run() {
-        				
+
         				if(!thereWasACollision()) {
+        					isRunning = true;
         					
-        					if(alreadyover) {
+        					if(alredyOver) {
         						reset();
         					}
-        					
-        					alreadyover = false;
+        					        					        					
+        					alredyOver = false;
         					
         					moveFloor();
             				
@@ -73,16 +78,39 @@ public class Race implements Game, KeyListener{
             				if(obstacles.size() < 1) {
             					createObstacle();
             				}
-            				
-        				} else if(thereWasACollision() && !alreadyover) {
+            				            				
+        				} else if(thereWasACollision() && !alredyOver) {
+        					isRunning = false;
+        					updateRecord();
         					gameOver();
-        					alreadyover = true;
+        					alredyOver = true;
         				}
         				
         			}
-        		}, 0, 10);
-    
+        		}, 0, delay);
+        
+        timer.scheduleAtFixedRate(new TimerTask() {
+			
+			@Override
+			public void run() {
+				if(isRunning) {
+					updateScore();
+				}
+			}
+		}, 0, 100);
     }
+	
+	public void updateScore() {
+		character.setScore(character.getScore() + 1);
+		
+		String score_label = "";
+		
+		for(int i = 0 ; i < 4; i++) {
+			score_label += screen.getScore().getText().charAt(i);
+		}
+		
+		screen.getScore().setText(score_label + String.format("%04d", character.getScore()));
+	}
 	
 	public void moveFloor() {
 		int x1 = screen.getFloor1().getX();
@@ -185,6 +213,21 @@ public class Race implements Game, KeyListener{
 	public void reset() {
 		character.getLbImg().setIcon(new ImageIcon(getClass().getResource(characterImgPath)));
 		character.getLbImg().setBounds(characterX, characterX, character.getLbImg().getIcon().getIconWidth(), character.getLbImg().getIcon().getIconHeight());
+		character.setScore(0);
+	}
+	
+	public void updateRecord() {
+		if(character.getScore() > character.getRecord()) {
+			character.setRecord(character.getScore());
+		}
+		
+		String record_label = "";
+		
+		for(int i = 0 ; i < 4; i++) {
+			record_label += screen.getRecord().getText().charAt(i);
+		}
+		
+		screen.getRecord().setText(record_label + String.format("%04d", character.getRecord()));
 	}
 	
 	@Override
