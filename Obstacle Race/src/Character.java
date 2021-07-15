@@ -12,9 +12,6 @@ public class Character extends Element {
 		
 		getLbImg().setBounds(x, y, getLbImg().getIcon().getIconWidth(), getLbImg().getIcon().getIconHeight());
 		this.yInitial = y;
-		
-		/*Border blackline = BorderFactory.createLineBorder(Color.black);
-		getLbImg().setBorder(blackline);*/
 	}
 	
 	public void jump() {

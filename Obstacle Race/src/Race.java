@@ -13,7 +13,6 @@ import java.awt.event.KeyListener;
 public class Race implements Game, KeyListener{
 	private Screen screen;
 	private Character character;
-
 	Obstacle obstacleTemplates[] = {
 			new Obstacle("/media/obstacles/vaccine_small.png"),
 			new Obstacle("/media/obstacles/vaccine_medium.png"),
@@ -23,13 +22,16 @@ public class Race implements Game, KeyListener{
 			new Obstacle("/media/obstacles/vaccines_wide.png"),
 			//new Obstacle("/media/obstacles/vaccines_large.png")
 	};
-	
 	ArrayBlockingQueue<Obstacle> obstacles;
+	
+	private final int characterX = 80;
+	private final int characterY = 280;
+	private final String characterImgPath = "/media/Luffy.gif";
 	
 	Race() {
 		obstacles = new ArrayBlockingQueue<Obstacle>(10);
 		
-		character = new Character("/media/Luffy.gif", 80, 280);
+		character = new Character(characterImgPath, characterX, characterY);
 			
 		screen = new Screen();	
 		screen.createVisualElements(character);
@@ -48,11 +50,18 @@ public class Race implements Game, KeyListener{
     	
     	timer.schedule(
         		new TimerTask() {
-        			int teste = 0;
+        			boolean alreadyover; //não deixa o final acontecer mais de uma vez
         			
         			public void run() {
         				
         				if(!thereWasACollision()) {
+        					
+        					if(alreadyover) {
+        						reset();
+        					}
+        					
+        					alreadyover = false;
+        					
         					moveFloor();
             				
             				if(!obstacles.isEmpty()) {
@@ -64,10 +73,10 @@ public class Race implements Game, KeyListener{
             				if(obstacles.size() < 1) {
             					createObstacle();
             				}
-        				} else if(thereWasACollision() && teste == 0) {
+            				
+        				} else if(thereWasACollision() && !alreadyover) {
         					gameOver();
-        					teste = 1;
-        					//timer.cancel();
+        					alreadyover = true;
         				}
         				
         			}
@@ -155,28 +164,6 @@ public class Race implements Game, KeyListener{
 	}
 	
 	public void gameOver() {
-		/*ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-		
-		scheduler.schedule(new Runnable() {
-		       public void run() {
-		    	   JLabel explosion = new JLabel("", new ImageIcon(getClass().getResource("/media/explosion.gif")), JLabel.CENTER);
-		    	   explosion.setBounds(0, character.getLbImg().getY() - (character.getImg().getIconHeight() / 2), explosion.getIcon().getIconWidth(), explosion.getIcon().getIconHeight());
-
-		    	   screen.obtainContainer().add(explosion, 0);
-		    	   
-		    	   try {
-		    		   scheduler.wait(1000);
-		    	   } catch (InterruptedException e) {
-		    		   // TODO Auto-generated catch block
-		    		   e.printStackTrace();
-		    	   }
-		    	   
-		    	   character.getLbImg().setIcon(new ImageIcon(getClass().getResource("/media/alligator.png")));
-	    		   screen.obtainContainer().remove(explosion);
-	    		   
-	    		   System.out.println("teste ui ui");
-		       }
-		}, 0, TimeUnit.SECONDS);*/
 		
 		JLabel explosion = new JLabel("", new ImageIcon(getClass().getResource("/media/explosion.gif")), JLabel.CENTER);
 		explosion.setBounds(0, character.getLbImg().getY() - (character.getImg().getIconHeight() / 2), explosion.getIcon().getIconWidth(), explosion.getIcon().getIconHeight());
@@ -195,6 +182,11 @@ public class Race implements Game, KeyListener{
 		screen.obtainContainer().remove(explosion);
 	}
 
+	public void reset() {
+		character.getLbImg().setIcon(new ImageIcon(getClass().getResource(characterImgPath)));
+		character.getLbImg().setBounds(characterX, characterX, character.getLbImg().getIcon().getIconWidth(), character.getLbImg().getIcon().getIconHeight());
+	}
+	
 	@Override
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
