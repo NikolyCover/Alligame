@@ -3,24 +3,35 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Character extends Element {
-	private String name;
+	private String imgPath;
+	private int x;
+	private int y;
+	private int maxY, minY;
+	private int velocityY;
+	private int gravity;
+	
 	private int score;
 	private int record;
-	private int yInitial;
 
-	Character(String imgPath, int x, int y) {
+	Character(String imgPath, int x, int y, int minY) {
 		super(imgPath);
 		
-		getLbImg().setBounds(x, y, getLbImg().getIcon().getIconWidth(), getLbImg().getIcon().getIconHeight());
+		this.getLbImg().setSize(this.getLbImg().getIcon().getIconWidth(), this.getLbImg().getIcon().getIconHeight());
 		
-		this.yInitial = y;
+		this.setImgPath(imgPath);
+		this.x = x;
+		this.y = y;
+		this.minY = minY;
+		this.maxY = y;
+		this.velocityY = 0;
+		this.gravity = 2;
 		this.score = 0;
 		this.record = 0;
 	}
 	
-	public void jump() {
+	public void jump_unused() {
 	
-		if(getLbImg().getY() == yInitial) {
+		if(getLbImg().getY() == maxY) {
 			Timer timer = new Timer();
 	        
 	    	timer.scheduleAtFixedRate(
@@ -39,7 +50,7 @@ public class Character extends Element {
 	    				else if(isFalling()) {
 	    					getLbImg().setLocation(getLbImg().getX(), getLbImg().getY() + 1);
 	    					
-	    					if(getLbImg().getY() >= yInitial) {
+	    					if(getLbImg().getY() >= maxY) {
 	    						timer.cancel();
 	    					}
 	    				}
@@ -57,12 +68,19 @@ public class Character extends Element {
     	
     }
 	
-	public String getName() {
-		return name;
+	public void jump() {
+		if(this.y == this.maxY) {
+			this.velocityY = -30;
+		}
 	}
 	
-	public void setName(String name) {
-		this.name = name;
+	public void move() {
+		if(this.y + this.velocityY <= this.maxY && this.y + this.velocityY >= this.minY) {
+			this.y += this.velocityY;
+			this.velocityY += this.gravity;
+		}
+		
+		this.getLbImg().setLocation(this.x, this.y);
 	}
 	
 	public int getScore() {
@@ -82,7 +100,31 @@ public class Character extends Element {
 	}
 
 	public int getyInitial() {
-		return yInitial;
+		return maxY;
+	}
+
+	public int getX() {
+		return x;
+	}
+
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public void setY(int y) {
+		this.y = y;
+	}
+
+	public String getImgPath() {
+		return imgPath;
+	}
+
+	public void setImgPath(String imgPath) {
+		this.imgPath = imgPath;
 	}
 	
 }

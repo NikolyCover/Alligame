@@ -21,8 +21,8 @@ public class Screen extends JFrame{
 
 	Font pressStart;
 
-	Screen() {
-		super("Alligame");
+	Screen(String name) {
+		super(name);
 		
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setSize(1200, 600);
@@ -49,13 +49,13 @@ public class Screen extends JFrame{
 
 	public void createVisualElements(Character character) {
 		floor1 = new JLabel(new ImageIcon(getClass().getResource("/media/land.png")), JLabel.CENTER);
-		floor1.setBounds(0, 400, 2400, 200);
+		floor1.setBounds(0, 400, floor1.getIcon().getIconWidth(), floor1.getIcon().getIconHeight());
 		
 		floor2 = new JLabel(new ImageIcon(getClass().getResource("/media/land.png")), JLabel.CENTER);
-		floor2.setBounds(2400, 400, 2400, 200);
+		floor2.setBounds(2400, 400, floor1.getIcon().getIconWidth(), floor1.getIcon().getIconHeight());
 		
 		sky = new JLabel(new ImageIcon(getClass().getResource("/media/sky.png")), JLabel.CENTER);
-		sky.setBounds(0, 0, 1200, 514);
+		sky.setBounds(0, 0, sky.getIcon().getIconWidth(), sky.getIcon().getIconHeight());
 		
 		record = new JLabel("RC: 0000");
 		record.setBounds(860, 0, 200, 100);

@@ -12,7 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class Race implements Game, KeyListener{
-	private int delay = 10;
+	private int delay;
 	private Screen screen;
 	private Character character;
 	Obstacle obstacleTemplates[] = {
@@ -25,41 +25,33 @@ public class Race implements Game, KeyListener{
 			//new Obstacle("/media/obstacles/vaccines_large.png")
 	};
 	ArrayBlockingQueue<Obstacle> obstacles;
-	
-	private final int characterX = 80;
-	private final int characterY = 280;
-	private final String characterImgPath = "/media/Luffy.gif";
-	
-	private boolean isRunning; //true if character is running
+		
+	private boolean characterIsRunning;
 		
 	Race() {
-		obstacles = new ArrayBlockingQueue<Obstacle>(10);
+		this.delay = 10;
+		this.obstacles = new ArrayBlockingQueue<Obstacle>(10);
 		
-		character = new Character(characterImgPath, characterX, characterY);
+		this.character = new Character("/media/Luffy.gif", 80, 280, 25);
 			
-		screen = new Screen();	
-		screen.createVisualElements(character);
-		screen.addKeyListener(this);
+		this.screen = new Screen("Alligame");	
+		this.screen.createVisualElements(character);
+		this.screen.addKeyListener(this);
 	}
 
 	@Override
-	public void play() {
-		// TODO Auto-generated method stub
-		
-	}
-	
 	public void run() {		
         Timer timer = new Timer();
     	
     	timer.schedule(
         		new TimerTask() {
-        			boolean alredyOver; //não deixa o final acontecer mais de uma vez
+        			boolean alredyOver;
         			
         			@Override
         			public void run() {
 
         				if(!thereWasACollision()) {
-        					isRunning = true;
+        					characterIsRunning = true;
         					
         					if(alredyOver) {
         						reset();
@@ -68,11 +60,11 @@ public class Race implements Game, KeyListener{
         					alredyOver = false;
         					
         					moveFloor();
+        					character.move();
             				
             				if(!obstacles.isEmpty()) {
             					moveObstacle();
             					removeUnusedObstacles();
-            					
             				}
             				
             				if(obstacles.size() < 1) {
@@ -80,7 +72,7 @@ public class Race implements Game, KeyListener{
             				}
             				            				
         				} else if(thereWasACollision() && !alredyOver) {
-        					isRunning = false;
+        					characterIsRunning = false;
         					updateRecord();
         					gameOver();
         					alredyOver = true;
@@ -93,7 +85,7 @@ public class Race implements Game, KeyListener{
 			
 			@Override
 			public void run() {
-				if(isRunning) {
+				if(characterIsRunning) {
 					updateScore();
 				}
 			}
@@ -168,10 +160,10 @@ public class Race implements Game, KeyListener{
 	}
 
 	public boolean thereWasACollision() {
-		int crt_x1 = character.getLbImg().getX();
-		int crt_x2 = character.getLbImg().getX() + character.getLbImg().getWidth();
+		int crt_x1 = character.getX();
+		int crt_x2 = character.getX() + character.getLbImg().getWidth();
 		//int crt_y1 = character.getLbImg().getY();
-		int crt_y2 = character.getLbImg().getY() + character.getLbImg().getHeight();
+		int crt_y2 = character.getY() + character.getLbImg().getHeight();
 		
 		for(Obstacle obs : obstacles) {
 			int obs_x1 = obs.getLbImg().getX();
@@ -192,11 +184,10 @@ public class Race implements Game, KeyListener{
 	}
 	
 	public void gameOver() {
-		
 		JLabel explosion = new JLabel("", new ImageIcon(getClass().getResource("/media/explosion.gif")), JLabel.CENTER);
 		explosion.setBounds(0, character.getLbImg().getY() - (character.getImg().getIconHeight() / 2), explosion.getIcon().getIconWidth(), explosion.getIcon().getIconHeight());
-		
 		screen.obtainContainer().add(explosion, 0);
+		
 		character.getLbImg().setIcon(new ImageIcon(getClass().getResource("/media/alligator.png")));
 		character.getLbImg().setSize(character.getLbImg().getIcon().getIconWidth(), character.getLbImg().getIcon().getIconHeight());
 
@@ -211,8 +202,11 @@ public class Race implements Game, KeyListener{
 	}
 
 	public void reset() {
-		character.getLbImg().setIcon(new ImageIcon(getClass().getResource(characterImgPath)));
-		character.getLbImg().setBounds(characterX, characterX, character.getLbImg().getIcon().getIconWidth(), character.getLbImg().getIcon().getIconHeight());
+		screen.obtainContainer().remove(obstacles.element().getLbImg());
+		obstacles.remove();
+		
+		character.getLbImg().setIcon(new ImageIcon(getClass().getResource(character.getImgPath())));
+		character.getLbImg().setBounds(character.getX(), character.getX(), character.getLbImg().getIcon().getIconWidth(), character.getLbImg().getIcon().getIconHeight());
 		character.setScore(0);
 	}
 	
@@ -234,7 +228,7 @@ public class Race implements Game, KeyListener{
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
 		
-		if(key ==  KeyEvent.VK_SPACE) {
+		if(key == KeyEvent.VK_SPACE && characterIsRunning) {
 			character.jump();
 		}
 		
