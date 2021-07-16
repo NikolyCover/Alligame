@@ -11,11 +11,13 @@ import javax.swing.JLabel;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class Race implements Game, KeyListener{
+public class Race implements Game, KeyListener {
 	private int delay;
-	private int initiaVelocity, velocity;
+	private final int initiaVelocity;
+	private int velocity;
 	private Screen screen;
 	private Character character;
+	
 	Obstacle obstacleTemplates[] = {
 			new Obstacle("/media/obstacles/vaccine_small.png"),
 			new Obstacle("/media/obstacles/vaccine_medium.png"),
@@ -25,7 +27,7 @@ public class Race implements Game, KeyListener{
 			new Obstacle("/media/obstacles/vaccines_wide.png"),
 			new Obstacle("/media/obstacles/vaccines_large.png")
 	};
-	ArrayBlockingQueue<Obstacle> obstacles;
+	ArrayBlockingQueue<Obstacle> obstacles; //associação de composição
 		
 	private boolean characterIsRunning = false;
 	private boolean alredyOver = false;
@@ -34,11 +36,12 @@ public class Race implements Game, KeyListener{
 		this.delay = 10;
 		this.initiaVelocity = -12;
 		this.velocity = this.initiaVelocity;
+		
 		this.obstacles = new ArrayBlockingQueue<Obstacle>(10);
 		
 		this.character = new Character("/media/Luffy.gif", 80, 280, 20);
 			
-		this.screen = new Screen("Alligame");	
+		this.screen = new Screen("Alligame", new ImageIcon(getClass().getResource("/media/alligator.png")));	
 		this.screen.createVisualElements(character);
 		this.screen.addKeyListener(this);
 	}
@@ -90,8 +93,7 @@ public class Race implements Game, KeyListener{
         				if(characterIsRunning) {
         					updateScore();
             				            				
-            				if(character.getScore() % 75 == 0) {
-            					System.out.println("teste");
+            				if(character.getScore() % 150 == 0) {
             					velocity += -1;            					
             				}
         				}
@@ -100,7 +102,7 @@ public class Race implements Game, KeyListener{
     }	
 
 	public boolean thereWasACollision() {
-		int errorMargin = 10; 
+		int errorMargin = 8; 
 		
 		int crt_x1 = character.getX();
 		int crt_x2 = character.getX() + character.getLbImg().getWidth();
@@ -132,8 +134,6 @@ public class Race implements Game, KeyListener{
 	}
 	
 	public void moveFloor() {
-		System.out.println(this.velocity);
-
 		screen.getFloor1().setLocation(screen.getFloor1().getX() + this.velocity, screen.getFloor1().getY());
 		screen.getFloor2().setLocation(screen.getFloor2().getX() + this.velocity, screen.getFloor2().getY());
 		
@@ -218,6 +218,7 @@ public class Race implements Game, KeyListener{
 		screen.getRecord().setText(record_label + String.format("%04d", character.getRecord()));
 	}
 
+	@Override
 	public void gameOver() {
 		JLabel explosion = new JLabel("", new ImageIcon(getClass().getResource("/media/explosion.gif")), JLabel.CENTER);
 		explosion.setBounds(0, character.getLbImg().getY() - (character.getImg().getIconHeight() / 2), explosion.getIcon().getIconWidth(), explosion.getIcon().getIconHeight());
@@ -235,6 +236,7 @@ public class Race implements Game, KeyListener{
 		screen.obtainContainer().remove(explosion);
 	}
 
+	@Override
 	public void reset() {
 		screen.obtainContainer().remove(obstacles.element().getLbImg());
 		obstacles.remove();

@@ -21,9 +21,10 @@ public class Screen extends JFrame{
 
 	Font pressStart;
 
-	Screen(String name) {
+	Screen(String name, ImageIcon icon) {
 		super(name);
 		
+		this.setIconImage(icon.getImage());
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		this.setSize(1200, 600);
 		this.setResizable(false);
