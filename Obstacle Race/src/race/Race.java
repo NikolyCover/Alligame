@@ -30,10 +30,10 @@ public class Race implements Game, KeyListener{
 	private boolean alredyOver = false;
 		
 	Race() {
-		this.delay = 1;
+		this.delay = 10;
 		this.obstacles = new ArrayBlockingQueue<Obstacle>(10);
 		
-		this.character = new Character("/media/Luffy.gif", 80, 280, 25);
+		this.character = new Character("/media/Luffy.gif", 80, 280, 20);
 			
 		this.screen = new Screen("Alligame");	
 		this.screen.createVisualElements(character);
@@ -91,6 +91,8 @@ public class Race implements Game, KeyListener{
     }	
 
 	public boolean thereWasACollision() {
+		int errorMargin = 10; 
+		
 		int crt_x1 = character.getX();
 		int crt_x2 = character.getX() + character.getLbImg().getWidth();
 		int crt_y2 = character.getY() + character.getLbImg().getHeight();
@@ -102,12 +104,19 @@ public class Race implements Game, KeyListener{
 			int obs_y2 = obs.getLbImg().getY() + obs.getLbImg().getHeight();
 			
 			if((obs_x1 > crt_x1 && obs_x1 < crt_x2) && (crt_y2 <= obs_y2 && crt_y2 >= obs_y1)) {
-				return true;
+				if(crt_x2 - obs_x1 < errorMargin) {
+					return false;
+				} else {
+					return true;
+				}
 			}
 			
 			else if((crt_x1 > obs_x1 && crt_x1 < obs_x2) && (crt_y2 <= obs_y2 && crt_y2 >= obs_y1)) {
-				return true;
-			}
+				if(obs_x2 - crt_x1 < errorMargin) {
+					return false;
+				} else {
+					return true;
+				}			}
 		}
 		
 		return false;
@@ -207,7 +216,6 @@ public class Race implements Game, KeyListener{
 		try {
 			Thread.sleep(900);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
