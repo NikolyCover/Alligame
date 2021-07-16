@@ -13,6 +13,7 @@ import java.awt.event.KeyListener;
 
 public class Race implements Game, KeyListener{
 	private int delay;
+	private int initiaVelocity, velocity;
 	private Screen screen;
 	private Character character;
 	Obstacle obstacleTemplates[] = {
@@ -22,7 +23,7 @@ public class Race implements Game, KeyListener{
 			new Obstacle("/media/obstacles/vaccines_small.png"),
 			new Obstacle("/media/obstacles/vaccines_medium.png"),
 			new Obstacle("/media/obstacles/vaccines_wide.png"),
-			//new Obstacle("/media/obstacles/vaccines_large.png")
+			new Obstacle("/media/obstacles/vaccines_large.png")
 	};
 	ArrayBlockingQueue<Obstacle> obstacles;
 		
@@ -31,6 +32,8 @@ public class Race implements Game, KeyListener{
 		
 	Race() {
 		this.delay = 10;
+		this.initiaVelocity = -12;
+		this.velocity = this.initiaVelocity;
 		this.obstacles = new ArrayBlockingQueue<Obstacle>(10);
 		
 		this.character = new Character("/media/Luffy.gif", 80, 280, 20);
@@ -79,15 +82,21 @@ public class Race implements Game, KeyListener{
         			}
         		}, 0, delay);
         
-        timer.scheduleAtFixedRate(new TimerTask() {
-			
-			@Override
-			public void run() {
-				if(characterIsRunning) {
-					updateScore();
-				}
-			}
-		}, 0, 100);
+    	timer.scheduleAtFixedRate(
+        		new TimerTask() {
+        			
+        			@Override
+        			public void run() {
+        				if(characterIsRunning) {
+        					updateScore();
+            				            				
+            				if(character.getScore() % 75 == 0) {
+            					System.out.println("teste");
+            					velocity += -1;            					
+            				}
+        				}
+        			}
+        		}, 0, 100);
     }	
 
 	public boolean thereWasACollision() {
@@ -123,24 +132,28 @@ public class Race implements Game, KeyListener{
 	}
 	
 	public void moveFloor() {
-		int x1 = screen.getFloor1().getX();
-		int x2 = screen.getFloor2().getX();
+		System.out.println(this.velocity);
+
+		screen.getFloor1().setLocation(screen.getFloor1().getX() + this.velocity, screen.getFloor1().getY());
+		screen.getFloor2().setLocation(screen.getFloor2().getX() + this.velocity, screen.getFloor2().getY());
 		
-		screen.getFloor1().setLocation(x1 - 10, screen.getFloor1().getY());
-		screen.getFloor2().setLocation(x2 - 10, screen.getFloor2().getY());
+		//upgraded axes
+		int floor1_x1 = screen.getFloor1().getX();
+		int floor1_x2 = floor1_x1 + screen.getFloor1().getWidth();
 		
-		if(screen.getFloor1().getX() == 0 || screen.getFloor2().getX() == 0) {
-			if(screen.getFloor1().getX() == 0) {
-				screen.getFloor2().setLocation(screen.getFloor1().getWidth(), screen.getFloor2().getY());
-			} else {
-				screen.getFloor1().setLocation(screen.getFloor2().getWidth(), screen.getFloor1().getY());
-			}
+		int floor2_x1 = screen.getFloor2().getX();
+		int floor2_x2 = floor2_x1 + screen.getFloor2().getWidth();
+		
+		if(floor1_x2 <= 0) {
+			screen.getFloor1().setLocation(screen.getFloor2().getX() + screen.getFloor2().getWidth(), screen.getFloor1().getY());
+		} else if(floor2_x2 <= 0) {
+			screen.getFloor2().setLocation(screen.getFloor1().getX() + screen.getFloor1().getWidth(), screen.getFloor2().getY());
 		}
 	}
 	
 	public void moveObstacle() {
 		for(Obstacle obs : obstacles) {
-			obs.getLbImg().setLocation(obs.getLbImg().getX() - 10, obs.getLbImg().getY());
+			obs.getLbImg().setLocation(obs.getLbImg().getX() + this.velocity, obs.getLbImg().getY());
 		}
 	}
 	
@@ -229,6 +242,7 @@ public class Race implements Game, KeyListener{
 		character.getLbImg().setIcon(new ImageIcon(getClass().getResource(character.getImgPath())));
 		character.getLbImg().setBounds(character.getX(), character.getX(), character.getLbImg().getIcon().getIconWidth(), character.getLbImg().getIcon().getIconHeight());
 		character.setScore(0);
+		this.velocity = initiaVelocity;
 	}
 	
 	@Override
