@@ -1,6 +1,4 @@
 package race;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Character extends Element {
 	private String imgPath;
@@ -9,15 +7,14 @@ public class Character extends Element {
 	private int maxY, minY;
 	private int velocityY;
 	private int gravity;
+	private int width, height;
 	
 	private int score;
 	private int record;
 
 	Character(String imgPath, int x, int y, int minY) {
 		super(imgPath);
-		
-		this.getLbImg().setSize(this.getLbImg().getIcon().getIconWidth(), this.getLbImg().getIcon().getIconHeight());
-		
+				
 		this.setImgPath(imgPath);
 		this.x = x;
 		this.y = y;
@@ -27,46 +24,11 @@ public class Character extends Element {
 		this.gravity = 2;
 		this.score = 0;
 		this.record = 0;
+		this.width = this.getLbImg().getIcon().getIconWidth();
+		this.height = this.getLbImg().getIcon().getIconHeight();
+		
+		this.getLbImg().setSize(this.width, this.height);
 	}
-	
-	public void jump_unused() {
-	
-		if(getLbImg().getY() == maxY) {
-			Timer timer = new Timer();
-	        
-	    	timer.scheduleAtFixedRate(
-	    		new TimerTask() {
-	    			private boolean falling = false;
-	    			
-	    			public void run() {
-	    				if(!isFalling()) {
-	    					getLbImg().setLocation(getLbImg().getX(), getLbImg().getY() - 1);
-	    					
-	    					if(getLbImg().getY() <= 25) {
-	    						setFalling(true);
-	    					}
-	    				}
-	    				
-	    				else if(isFalling()) {
-	    					getLbImg().setLocation(getLbImg().getX(), getLbImg().getY() + 1);
-	    					
-	    					if(getLbImg().getY() >= maxY) {
-	    						timer.cancel();
-	    					}
-	    				}
-	    			}
-	    			
-					public boolean isFalling() {
-						return falling;
-					}
-					
-					public void setFalling(boolean falling) {
-						this.falling = falling;
-					}
-	    		}, 0, 2);
-		}
-    	
-    }
 	
 	public void jump() {
 		if(this.y == this.maxY) {
@@ -125,6 +87,10 @@ public class Character extends Element {
 
 	public void setImgPath(String imgPath) {
 		this.imgPath = imgPath;
+	}
+
+	public int getHeight() {
+		return height;
 	}
 	
 }
